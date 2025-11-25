@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Reconocimiento de Lenguaje de Señas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --gray: #95a5a6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .tab-button {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            background-color: var(--light);
+        }
+        
+        .tab-button.active {
+            color: var(--secondary);
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h3 i {
+            margin-right: 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: var(--secondary);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid var(--secondary);
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+        }
+        
+        .timeline-item:nth-child(odd)::after {
+            right: -10px;
+        }
+        
+        .timeline-item:nth-child(even)::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .team-member {
+            text-align: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .team-member img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 4px solid var(--light);
+        }
+        
+        .user-stories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .user-story {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .user-story h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .user-story p {
+            color: var(--gray);
+            font-style: italic;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .tech-item {
+            background: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tech-item i {
+            margin-right: 5px;
+            color: var(--secondary);
+        }
+        
+        .class-diagram {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        .class-box {
+            border: 1px solid var(--gray);
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            min-width: 250px;
+        }
+        
+        .class-header {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .class-body {
+            padding: 0.8rem;
+        }
+        
+        .class-section {
+            margin-bottom: 0.8rem;
+        }
+        
+        .class-section-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: var(--dark);
+            border-bottom: 1px solid var(--light);
+            padding-bottom: 0.2rem;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .test-card h4 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .test-card ul {
+            padding-left: 1.2rem;
+        }
+        
+        .test-card li {
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+            
+            .timeline-item:nth-child(odd)::after,
+            .timeline-item:nth-child(even)::after {
+                left: 21px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-button {
+                flex: 1 0 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-hands"></i> Sistema Inteligente para Reconocimiento de Lenguaje de Señas</h1>
+            <p>Una solución tecnológica para facilitar la comunicación de personas sordomudas mediante IA y modelos Transformer</p>
+        </div>
+    </header>
+    
+    <div class="nav-tabs">
+        <button class="tab-button active" data-tab="descripcion">Descripción</button>
+        <button class="tab-button" data-tab="objetivos">Objetivos</button>
+        <button class="tab-button" data-tab="planificacion">Planificación</button>
+        <button class="tab-button" data-tab="metodologia">Metodología</button>
+        <button class="tab-button" data-tab="alcance">Alcance</button>
+        <button class="tab-button" data-tab="historias">Historias de Usuario</button>
+        <button class="tab-button" data-tab="tecnologia">Tecnología</button>
+        <button class="tab-button" data-tab="pruebas">Pruebas</button>
+    </div>
+    
+    <div class="container">
+        <!-- Descripción del Proyecto -->
+        <div id="descripcion" class="tab-content active">
+            <h2 class="section-title">Descripción del Proyecto</h2>
+            <div class="card">
+                <h3><i class="fas fa-info-circle"></i> Propósito del Sistema</h3>
+                <p>Este proyecto tiene como objetivo principal el desarrollo de un sistema inteligente que utilice tecnología de reconocimiento de lenguaje de señas en tiempo real, permitiendo la traducción instantánea de gestos de señas en texto o voz.</p>
+                <p>El sistema será capaz de reconocer signos de diferentes lenguajes de señas, adaptándose a las particularidades de cada contexto. Se utilizarán modelos de aprendizaje profundo basados en Transformers, conocidos por su capacidad para procesar secuencias de datos, lo cual los hace altamente eficientes para tareas como la interpretación del lenguaje de señas.</p>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Problemática</h3>
+                <p>El lenguaje de señas es una herramienta vital para las personas sordomudas, pero la falta de conocimiento y comprensión generalizada de este lenguaje por parte de la población en general crea una barrera significativa en la comunicación cotidiana.</p>
+                <p>En situaciones cotidianas como trámites administrativos, interacciones laborales o educativas, las personas sordomudas a menudo dependen de la ayuda de intérpretes, lo que no siempre es una opción viable. Este desafío se ve agravado por la escasez de tecnologías que proporcionen soluciones accesibles y efectivas en tiempo real.</p>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-bullseye"></i> Justificación</h3>
+                <p>La inclusión social de las personas con discapacidad auditiva es una prioridad para garantizar su participación activa y equitativa en la sociedad. Sin embargo, las barreras de comunicación continúan siendo un obstáculo significativo.</p>
+                <p>La implementación de un sistema de reconocimiento de lenguaje de señas en tiempo real representa un paso importante para abordar esta desigualdad. Este proyecto no solo responde a una necesidad social urgente, sino que también aprovecha las capacidades de la inteligencia artificial, específicamente de los modelos Transformers, para proporcionar una solución técnica avanzada.</p>
+            </div>
+        </div>
+        
+        <!-- Objetivos -->
+        <div id="objetivos" class="tab-content">
+            <h2 class="section-title">Objetivos del Proyecto</h2>
+            <div class="card">
+                <h3><i class="fas fa-flag"></i> Objetivo Principal</h3>
+                <p>Ofrecer una solución accesible y efectiva para que las personas sordomudas puedan comunicarse de manera fluida y eficiente con aquellas que no conocen el lenguaje de señas.</p>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-bullseye"></i> Objetivos Específicos</h3>
+                <ul>
+                    <li>Desarrollar un modelo de reconocimiento de lenguaje de señas basado en Transformers para la traducción en tiempo real de gestos en texto o voz.</li>
+                    <li>Crear una interfaz de usuario accesible y amigable para que tanto personas sordomudas como oyentes puedan interactuar fácilmente con el sistema.</li>
+                    <li>Validar el sistema mediante pruebas en escenarios reales, para evaluar su precisión, facilidad de uso y efectividad en la mejora de la comunicación entre sordomudos y oyentes.</li>
+                    <li>Optimizar el rendimiento del modelo de reconocimiento, para garantizar respuestas rápidas y precisas, incluso en condiciones variables de luz o contexto.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Planificación -->
+        <div id="planificacion" class="tab-content">
+            <h2 class="section-title">Planificación del Proyecto</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-road"></i> Cronograma de Implementación</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 1 - Fase 1</h4>
+                            <p>Análisis de requisitos y diseño inicial del sistema</p>
+                            <p><strong>Duración:</strong> 2 semanas</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 1 - Fase 2</h4>
+                            <p>Recolección y preparación del dataset de señas</p>
+                            <p><strong>Duración:</strong> 3 semanas</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 2 - Fase 1</h4>
+                            <p>Desarrollo del modelo Transformer para reconocimiento</p>
+                            <p><strong>Duración:</strong> 4 semanas</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 2 - Fase 2</h4>
+                            <p>Implementación del sistema de traducción al quechua</p>
+                            <p><strong>Duración:</strong> 3 semanas</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 3 - Fase 1</h4>
+                            <p>Desarrollo de la interfaz de usuario</p>
+                            <p><strong>Duración:</strong> 3 semanas</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h4>Sprint 3 - Fase 2</h4>
+                            <p>Pruebas de integración y validación con usuarios</p>
+                            <p><strong>Duración:</strong> 3 semanas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-users"></i> Equipo de Proyecto</h3>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Líder de Proyecto">
+                        <h4>Líder de Proyecto</h4>
+                        <p>Gestión general y coordinación</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Especialista en IA">
+                        <h4>Especialista en IA</h4>
+                        <p>Desarrollo de modelos de ML</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Desarrollador Backend">
+                        <h4>Desarrollador Backend</h4>
+                        <p>API y lógica del servidor</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Desarrollador Frontend">
+                        <h4>Desarrollador Frontend</h4>
+                        <p>Interfaz de usuario</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Especialista en UX">
+                        <h4>Especialista en UX</h4>
+                        <p>Diseño centrado en el usuario</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="https://via.placeholder.com/120" alt="Tester">
+                        <h4>Tester</h4>
+                        <p>Control de calidad y pruebas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metodología -->
+        <div id="metodologia" class="tab-content">
+            <h2 class="section-title">Metodología de Desarrollo</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-sync-alt"></i> Enfoque Ágil</h3>
+                <p>La metodología de desarrollo utilizada en este proyecto será Ágil. Se adoptará un enfoque iterativo e incremental, con un ciclo de desarrollo constante que se adapta a las necesidades emergentes del sistema.</p>
+                <p>Este enfoque permite realizar mejoras continuas y ajustar el sistema según los resultados obtenidos en las fases de pruebas y validación.</p>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-tasks"></i> Etapas Principales</h3>
+                <ul>
+                    <li><strong>Planificación:</strong> Definición de requisitos y metas del sistema, asegurando que se comprendan correctamente los objetivos de inclusión y accesibilidad.</li>
+                    <li><strong>Desarrollo incremental:</strong> Desarrollo en ciclos cortos, con entrega de versiones funcionales del sistema en cada iteración.</li>
+                    <li><strong>Pruebas y validación continua:</strong> Cada versión del sistema será evaluada para asegurar que cumple con los objetivos establecidos y responde correctamente en tiempo real.</li>
+                    <li><strong>Retroalimentación y ajustes:</strong> Los resultados de las pruebas de los usuarios se utilizarán para realizar ajustes en el sistema, mejorando la precisión y la usabilidad del modelo.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Alcance -->
+        <div id="alcance" class="tab-content">
+            <h2 class="section-title">Alcance del Proyecto</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-project-diagram"></i> Componentes Principales</h3>
+                <ul>
+                    <li><strong>Modelo de IA:</strong> Implementación de un modelo de Transformer entrenado para reconocer signos del lenguaje de señas en tiempo real, utilizando secuencias de movimientos corporales capturados por MediaPipe.</li>
+                    <li><strong>Traducción al quechua:</strong> Creación de un sistema de traducción automático de español a quechua para que el sistema no solo reconozca las señas, sino que las traduzca al quechua en tiempo real.</li>
+                    <li><strong>Interfaz de usuario:</strong> Desarrollo de una interfaz accesible que permita la interacción entre personas sordomudas y oyentes, mostrando tanto las palabras reconocidas como sus traducciones.</li>
+                    <li><strong>Optimización en tiempo real:</strong> El sistema será capaz de procesar señales en tiempo real con una precisión mínima del 80% y tiempos de latencia bajos.</li>
+                    <li><strong>Generación de métricas:</strong> Sistema de métricas para evaluar el rendimiento del modelo en tiempo real, medir la precisión del reconocimiento y mejorar el sistema basado en los datos obtenidos.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Historias de Usuario -->
+        <div id="historias" class="tab-content">
+            <h2 class="section-title">Historias de Usuario</h2>
+            
+            <div class="user-stories">
+                <div class="user-story">
+                    <h4>Historia 1: Comunicación en tiempo real</h4>
+                    <p><strong>Como:</strong> persona sorda</p>
+                    <p><strong>Quiero:</strong> poder comunicarme con personas oyentes a través de un sistema que reconozca mis señas</p>
+                    <p><strong>Para:</strong> facilitar la interacción en actividades cotidianas</p>
+                </div>
+                
+                <div class="user-story">
+                    <h4>Historia 2: Interfaz accesible</h4>
+                    <p><strong>Como:</strong> desarrollador de tecnología asistiva</p>
+                    <p><strong>Quiero:</strong> que el sistema tenga una interfaz de usuario intuitiva</p>
+                    <p><strong>Para:</strong> garantizar su uso en diferentes entornos</p>
+                </div>
+                
+                <div class="user-story">
+                    <h4>Historia 3: Traducción al quechua</h4>
+                    <p><strong>Como:</strong> hablante de quechua</p>
+                    <p><strong>Quiero:</strong> que las señas se traduzcan automáticamente al quechua</p>
+                    <p><strong>Para:</strong> preservar y promover mi lengua mientras facilito la comunicación</p>
+                </div>
+                
+                <div class="user-story">
+                    <h4>Historia 4: Uso educativo</h4>
+                    <p><strong>Como:</strong> institución educativa</p>
+                    <p><strong>Quiero:</strong> integrar este sistema en nuestras clases</p>
+                    <p><strong>Para:</strong> enseñar sobre la importancia del lenguaje de señas y la inclusión</p>
+                </div>
+                
+                <div class="user-story">
+                    <h4>Historia 5: Precisión en el reconocimiento</h4>
+                    <p><strong>Como:</strong> usuario final</p>
+                    <p><strong>Quiero:</strong> que el sistema reconozca mis señas con precisión</p>
+                    <p><strong>Para:</strong> que mi experiencia sea fluida y sin errores en la comunicación</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tecnología -->
+        <div id="tecnologia" class="tab-content">
+            <h2 class="section-title">Tecnología y Arquitectura</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-server"></i> Servidor y Lenguajes</h3>
+                <div class="tech-stack">
+                    <div class="tech-item"><i class="fab fa-python"></i> Python</div>
+                    <div class="tech-item"><i class="fas fa-bolt"></i> Flask/FastAPI</div>
+                    <div class="tech-item"><i class="fas fa-database"></i> SQLite/JSON</div>
+                    <div class="tech-item"><i class="fas fa-code"></i> PyTorch</div>
+                    <div class="tech-item"><i class="fas fa-camera"></i> MediaPipe</div>
+                    <div class="tech-item"><i class="fas fa-eye"></i> OpenCV</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-sitemap"></i> Modelo de Datos</h3>
+                <p>El modelo de datos estará compuesto por dos estructuras principales:</p>
+                <ul>
+                    <li><strong>Diccionario de traducción:</strong> Estructura basada en JSON o bases de datos, que contiene la relación entre palabras en español y su traducción en quechua.</li>
+                    <li><strong>Secuencias de movimiento:</strong> Cada muestra de lenguaje de señas será representada como una secuencia de características de movimiento extraídas de los puntos de referencia de MediaPipe.</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-project-diagram"></i> Diagrama de Clases</h3>
+                <div class="class-diagram">
+                    <div class="class-box">
+                        <div class="class-header">TraductorQuechua</div>
+                        <div class="class-body">
+                            <div class="class-section">
+                                <div class="class-section-title">Atributos</div>
+                                <div>diccionario</div>
+                                <div>reglas_verbos</div>
+                            </div>
+                            <div class="class-section">
+                                <div class="class-section-title">Métodos</div>
+                                <div>traducir_palabra()</div>
+                                <div>traducir_frase_completa()</div>
+                                <div>_buscar_variaciones()</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="class-box">
+                        <div class="class-header">SignLanguageTransformer</div>
+                        <div class="class-body">
+                            <div class="class-section">
+                                <div class="class-section-title">Atributos</div>
+                                <div>feature_projection</div>
+                                <div>pos_encoding</div>
+                                <div>transformer_encoder</div>
+                                <div>temporal_attention</div>
+                                <div>classifier</div>
+                            </div>
+                            <div class="class-section">
+                                <div class="class-section-title">Métodos</div>
+                                <div>forward()</div>
+                                <div>_init_weights()</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="class-box">
+                        <div class="class-header">FraseBuilderBilingue</div>
+                        <div class="class-body">
+                            <div class="class-section">
+                                <div class="class-section-title">Atributos</div>
+                                <div>frase_espanol</div>
+                                <div>frase_quechua</div>
+                                <div>palabra_actual</div>
+                                <div>contador</div>
+                            </div>
+                            <div class="class-section">
+                                <div class="class-section-title">Métodos</div>
+                                <div>procesar_prediccion()</div>
+                                <div>_confirmar_palabra()</div>
+                                <div>obtener_frase_bilingue()</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pruebas -->
+        <div id="pruebas" class="tab-content">
+            <h2 class="section-title">Estrategia de Pruebas</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-vial"></i> Pruebas Funcionales</h3>
+                <div class="test-grid">
+                    <div class="test-card">
+                        <h4>Detección de Señas</h4>
+                        <ul>
+                            <li>Verificar que el modelo detecte correctamente las señas</li>
+                            <li>Comparar salidas con traducciones esperadas</li>
+                            <li>Precisión mínima del 80%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Traducción Español-Quechua</h4>
+                        <ul>
+                            <li>Validar precisión de traducción automática</li>
+                            <li>Evaluación por expertos en quechua</li>
+                            <li>Errores máximos del 5%</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Interfaz de Usuario</h4>
+                        <ul>
+                            <li>Verificar que sea intuitiva y accesible</li>
+                            <li>Pruebas de usabilidad con usuarios reales</li>
+                            <li>Funcionamiento en diferentes dispositivos</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Integración del Sistema</h4>
+                        <ul>
+                            <li>Validar comunicación entre componentes</li>
+                            <li>Verificar flujo completo de detección a traducción</li>
+                            <li>Traducciones en tiempo real</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-tachometer-alt"></i> Pruebas de Rendimiento</h3>
+                <div class="test-grid">
+                    <div class="test-card">
+                        <h4>Velocidad y Latencia</h4>
+                        <ul>
+                            <li>Medir tiempos de respuesta</li>
+                            <li>Máximo 2 segundos por señal</li>
+                            <li>Interacción fluida</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Carga y Escalabilidad</h4>
+                        <ul>
+                            <li>Pruebas de estrés con múltiples usuarios</li>
+                            <li>Uso continuo durante horas</li>
+                            <li>Rendimiento estable bajo carga</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Consumo de Recursos</h4>
+                        <ul>
+                            <li>Supervisar CPU, GPU y memoria</li>
+                            <li>Máximo 80% de capacidad</li>
+                            <li>Funcionamiento en dispositivos de gama media</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-card">
+                        <h4>Estabilidad</h4>
+                        <ul>
+                            <li>Funcionamiento continuo prolongado</li>
+                            <li>Sin cuelgues ni errores</li>
+                            <li>Operación sin interrupciones</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Sistema Inteligente para Reconocimiento de Lenguaje de Señas en Tiempo Real</p>
+            <p>Proyecto de Inclusión Social mediante Inteligencia Artificial</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remover clase active de todos los botones y contenidos
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Agregar clase active al botón clickeado
+                    button.classList.add('active');
+                    
+                    // Mostrar el contenido correspondiente
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
